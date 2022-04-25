@@ -29,9 +29,9 @@ To test the python library, run the following proof and verification.
 ```bash
 from zkrp_pyo3 import zkrp_prove, zkrp_verify
 
-comm1, proof1 = zkrp_prove(2022)
-comm2, proof2 = zkrp_prove(2023)
+proof1, comm1 = zkrp_prove(2022)
+proof2, comm2 = zkrp_prove(2023)
 
-assert zkrp_verify(comm1, proof1)
-assert !zkrp_verify(comm1, proof2)
+assert zkrp_verify(proof1, comm1)
+assert !zkrp_verify(proof2, comm1)
 ```
