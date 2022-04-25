@@ -4,7 +4,10 @@ import asyncio
 import re
 import time
 
-from aiohttp import web
+# TODO:
+from aiohttp import web, ClientSession
+from collections import defaultdict
+
 from ratel.src.python.Client import send_requests, batch_interpolate
 from ratel.src.python.utils import key_inputmask, spareShares, players, threshold, blsPrime, \
     location_inputmask, http_host, http_port, mpc_port, location_db, openDB, getAccount, \
@@ -43,6 +46,39 @@ class Server:
         self.dbLock  = {}
         self.dbLock['access'] = asyncio.Lock()
         self.dbLock['execHistory'] = asyncio.Lock()
+		# TODO:
+        # self.dbLock['zkrpShare'] = asyncio.Lock()
+        self.zkrpShares = defaultdict(list)
+
+
+	# TODO:
+    async def send_request(self, url):
+        async with ClientSession() as session:
+            async with session.get(url) as resp:
+                json_response = await resp.json()
+                return json_response
+
+
+    async def send_requests(self, players, request):
+        tasks = []
+        for server_id in range(players):
+            task = send_request(f"http://{http_host}:{http_port + server_id}/{request}")
+            tasks.append(task)
+
+        results = await asyncio.gather(*tasks)
+        return 
+
+
+	# TODO:
+    async def get_zkrp_shares(self, players, inputmask_idxes):
+        request = f"zkrp_share_idxes/{inputmask_idxes}"
+        results = await send_requests(players, request)
+        for i in range(len(results)):
+            # TODO: how to parse the result string to a EC point?
+            self.zkrp_shares.append(re.split(",", results[i]["zkrp_shares"]))
+
+        return
+		
 
     async def http_server(self):
 
@@ -86,6 +122,20 @@ class Server:
             print(f"s{self.serverID} response: {res}")
             return web.json_response(data)
 
+        # TODO: 
+        async def handler_mpc_verify(request):
+            print(f"s{self.serverID} request: s{request}")
+            zkrp_share_idx = re.split(',', request.match_info.get("zkrp_share_idxes"))
+
+            while len(self.zkrpShares[zkrp_share_idx]) == 0:
+                await asyncio.sleep(10)
+                res = str(self.zkrpShares[zkrp_share_idx][0])
+
+            data = {
+                "zkrp_shares": res,
+            }
+            return web.json_response(data)
+
 
         app = web.Application()
 
@@ -101,6 +151,9 @@ class Server:
         cors.add(resource.add_route("GET", handler_inputmask))
         resource = cors.add(app.router.add_resource("/recoverdb/{list}"))
         cors.add(resource.add_route("GET", handler_recover_db))
+        # TODO:
+        resource = cors.add(app.router.add_resource("/mpcverify/{zkrp_share}"))
+        cors.add(resource.add_route("GET", handler_mpc_verify))
 
         print('Starting http server...')
         runner = web.AppRunner(app)
