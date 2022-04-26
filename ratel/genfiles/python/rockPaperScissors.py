@@ -50,17 +50,17 @@ async def runCreateGame(server, log):
 
     value1 = recover_input(server.db, maskedValue1, idxValue1)
     
-    """
+    # print(idxValue1, type(idxValue1))
+    
     # TODO: create the function to commit to the unmasked secret shares.
     # TODO: we also need to change the current zkrp interface to allow specifying r and choose range to prove.
-    self.zkrpShares[idxValue1].append('123')
 
-    # TODO: where to get the players? check Client.py
-    server.get_zkrp_shares(players(self.contract), idxValue1)
+    server.zkrpShares[idxValue1].append('123')
 
-    with open("./log", "a") as f:
-        f.write(str(server.zkrpShares))
-    """
+    results = await server.get_zkrp_shares(players(server.contract), f'{idxValue1}')
+
+    print(players(server.contract))
+    print(len(results))
 
     # TODO:
     # with open(, "wb") as f:

@@ -58,32 +58,15 @@ class Server:
 
 
 	# TODO:
-    async def send_request(self, url):
-        async with ClientSession() as session:
-            async with session.get(url) as resp:
-                json_response = await resp.json()
-                return json_response
-
-
-    async def send_requests(self, players, request):
-        tasks = []
-        for server_id in range(players):
-            task = send_request(f"http://{http_host}:{http_port + server_id}/{request}")
-            tasks.append(task)
-
-        results = await asyncio.gather(*tasks)
-        return 
-
-
-	# TODO:
     async def get_zkrp_shares(self, players, inputmask_idxes):
         request = f"zkrp_share_idxes/{inputmask_idxes}"
         results = await send_requests(players, request)
         for i in range(len(results)):
+            results[i] = re.split(",", results[i]["zkrp_share_idx"])
             # TODO: how to parse the result string to a EC point?
-            self.zkrp_shares.append(re.split(",", results[i]["zkrp_shares"]))
+            # self.zkrp_shares.append(re.split(",", results[i]["zkrp_shares"]))
 
-        return
+        return results
 		
 >>>>>>> backup
 
@@ -132,16 +115,21 @@ class Server:
         # TODO: 
         async def handler_mpc_verify(request):
             print(f"s{self.serverID} request: s{request}")
-            zkrp_share_idx = re.split(',', request.match_info.get("zkrp_share_idxes"))
-
-            while len(self.zkrpShares[zkrp_share_idx]) == 0:
-                await asyncio.sleep(10)
-                res = str(self.zkrpShares[zkrp_share_idx][0])
+            # zkrp_share_idx = re.split(',', request.match_info.get("zkrp_share_idxes"))
 
             data = {
-                "zkrp_shares": res,
+                "zkrp_share_idx": "123",
             }
             return web.json_response(data)
+
+            # while len(self.zkrpShares[zkrp_share_idx]) == 0:
+            #     await asyncio.sleep(10)
+            #     res = str(self.zkrpShares[zkrp_share_idx][0])
+
+            # data = {
+            #     "zkrp_shares": res,
+            # }
+            # return web.json_response(data)
 
 
         app = web.Application()
@@ -159,7 +147,7 @@ class Server:
         resource = cors.add(app.router.add_resource("/recoverdb/{list}"))
         cors.add(resource.add_route("GET", handler_recover_db))
         # TODO:
-        resource = cors.add(app.router.add_resource("/mpcverify/{zkrp_share}"))
+        resource = cors.add(app.router.add_resource("/zkrp_share_idxes/{mask_idxes}"))
         cors.add(resource.add_route("GET", handler_mpc_verify))
 
         print('Starting http server...')
