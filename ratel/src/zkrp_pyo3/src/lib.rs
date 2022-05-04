@@ -93,7 +93,7 @@ fn pedersen_compare(recovered_commitment: [u8; 32], onchain_commitment: [u8; 32]
 
 // TODO: return the blinding as bytes using as_bytes (returns &[u8; 32])
 #[pyfunction]
-fn zkrp_prove(secret_value: u64, bits: usize) -> PyResult<(Vec<u8>, [u8;32])> {
+fn zkrp_prove(secret_value: u64, bits: usize) -> PyResult<(Vec<u8>, [u8; 32], [u8; 32])> {
     // Generators for Pedersen commitments.  These can be selected
     // independently of the Bulletproofs generators.
     let pc_gens = PedersenGens::default();
@@ -119,11 +119,11 @@ fn zkrp_prove(secret_value: u64, bits: usize) -> PyResult<(Vec<u8>, [u8;32])> {
         bits,
     ).expect("A real program could handle errors");
 
-    Ok((proof.to_bytes(), committed_value.to_bytes()))
+    Ok((proof.to_bytes(), committed_value.to_bytes(), blinding.to_bytes()))
 }
 
 #[pyfunction]
-fn zkrp_verify(proof_bytes: Vec<u8>, committed_value_bytes: [u8;32]) -> PyResult<bool> {
+fn zkrp_verify(proof_bytes: Vec<u8>, committed_value_bytes: [u8; 32]) -> PyResult<bool> {
     // Generators for Pedersen commitments.  These can be selected
     // independently of the Bulletproofs generators.
     let pc_gens = PedersenGens::default();

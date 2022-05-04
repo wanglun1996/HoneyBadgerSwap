@@ -44,13 +44,15 @@ async def runCreateGame(server, log):
     player1 = log['args']['player1']
     idxValue1 = log['args']['idxValue1']
     maskedValue1 = log['args']['maskedValue1']
+    idxBlinding = log['args']['idxBlinding']
+    maskedBlinding = log['args']['maskedBlinding']
 
     # TODO: 
     proof, commitment = zkrp_prove(2022, 32)
     assert zkrp_verify(proof, commitment), "[Error]: Committed secret value does not pass range proof verification!"
 
     value1 = recover_input(server.db, maskedValue1, idxValue1)
-    blinding = 10
+    blinding = recover_input(server.db, maskedBlinding, idxBlinding)
 
     # TODO: where is the blinding mask created? we also need to share it.
     value1_bytes = list(value1.to_bytes(32, byteorder='little'))
