@@ -1,12 +1,13 @@
 import ast
 import asyncio
+import json
 import time
 from ratel.src.python.utils import location_sharefile, prog, mpcPort, blsPrime, sz, int_to_hex, hex_to_int, recover_input, fp, replay, players
 
 # TODO: Manually added code for zkrp
 # TODO: this can only be run under the virtual environment. can we move the package to the whole environment?
 # from zkrp_pyo3 import zkrp_prove, zkrp_verify
-from ratel.src.zkrp_pyo3.zkrp_pyo3 import zkrp_prove, zkrp_verify #, comm_mpc_open
+from ratel.src.zkrp_pyo3.zkrp_pyo3 import pedersen_commit, pedersen_open, zkrp_prove, zkrp_verify
 
 async def monitor(server, loop):
     blkNum = server.web3.eth.get_block_number()
@@ -45,26 +46,25 @@ async def runCreateGame(server, log):
     maskedValue1 = log['args']['maskedValue1']
 
     # TODO: 
-    proof, comm = zkrp_prove(2022)
+    proof, comm = zkrp_prove(2022, 32)
     assert zkrp_verify(proof, comm), "[Error]: Committed secret value does not pass range proof verification!"
 
     value1 = recover_input(server.db, maskedValue1, idxValue1)
-    
-    # print(idxValue1, type(idxValue1))
+    blinding = 10
+
+    # TODO: where is the blinding mask created? we also need to share it.
+    value1_bytes = list(value1.to_bytes(32, byteorder='little'))
+    blinding_bytes = list(blinding.to_bytes(32, byteorder='little'))
+
+    commitment = pedersen_commit(value1_bytes, blinding_bytes)
     
     # TODO: create the function to commit to the unmasked secret shares.
     # TODO: we also need to change the current zkrp interface to allow specifying r and choose range to prove.
 
-    server.zkrpShares[idxValue1].append('123')
-
+    server.zkrpShares[f'{idxValue1}'].append(commitment)
+    print(f'^^^^^, {idxValue1}')
     results = await server.get_zkrp_shares(players(server.contract), f'{idxValue1}')
-
-    print(players(server.contract))
-    print(len(results))
-
-    # TODO:
-    # with open(, "wb") as f:
-    #     zkrp_shares = f.read()
+    print('#####', results)
 
     # assert comm_mpc_open(zkrp_shares) == comm
 
