@@ -144,7 +144,7 @@ fn zkrp_verify(proof_bytes: Vec<u8>, committed_value_bytes: [u8;32]) -> PyResult
 fn zkrp_pyo3(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(pedersen_commit, m)?)?;
     m.add_function(wrap_pyfunction!(pedersen_open, m)?)?;
-    // m.add_function(wrap_pyfunction!(pedersen_aggregate, m)?)?;
+    m.add_function(wrap_pyfunction!(pedersen_aggregate, m)?)?;
     m.add_function(wrap_pyfunction!(pedersen_compare, m)?)?;
     m.add_function(wrap_pyfunction!(zkrp_prove, m)?)?;
     m.add_function(wrap_pyfunction!(zkrp_verify, m)?)?;
