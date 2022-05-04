@@ -53,9 +53,12 @@ fn pedersen_commit(secret_value_bytes: [u8; 32], blinding_bytes: [u8; 32]) -> Py
 }
 
 #[pyfunction]
-fn pedersen_open(secret_value_bytes: [u8; 32], blinding_bytes: [u8; 32], commitment_bytes: [u8; 32]) -> PyResult<bool> {
-    let opened_commitment_bytes = pedersen_commit(secret_value_bytes, blinding_bytes);
-    Ok(opened_commitment_bytes.expect("Failed to commit to the secret value.") == commitment_bytes)
+fn pedersen_open(secret_value: u64, blinding: u64, commitment_bytes: [u8; 32]) -> PyResult<bool> {
+    let secret_value_scalar = Scalar::from(secret_value);
+    let blinding_scalar = Scalar::from(blinding);
+    let pc_gens = PedersenGens::default();
+    let opened_commitment_bytes = pc_gens.commit(secret_value_scalar, blinding_scalar).compress().to_bytes();
+    Ok(opened_commitment_bytes == commitment_bytes)
 }
 
 

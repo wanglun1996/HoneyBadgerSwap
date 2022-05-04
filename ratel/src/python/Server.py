@@ -1,6 +1,7 @@
 import aiohttp_cors
 import ast
 import asyncio
+import json
 import re
 import time
 
@@ -61,12 +62,12 @@ class Server:
     async def get_zkrp_shares(self, players, inputmask_idxes):
         request = f"zkrp_share_idxes/{inputmask_idxes}"
         results = await send_requests(players, request)
+        parsed_results = []
         for i in range(len(results)):
-            results[i] = re.split(",", results[i]["zkrp_share_idx"])
-            # TODO: how to parse the result string to a EC point?
-            # self.zkrp_shares.append(re.split(",", results[i]["zkrp_shares"]))
+            parsed_results.append(json.loads(results[i]['zkrp_share_idx'])[0])
+        print("((((((((", parsed_results)
 
-        return results
+        return parsed_results
 		
 >>>>>>> backup
 
@@ -115,21 +116,13 @@ class Server:
         # TODO: 
         async def handler_mpc_verify(request):
             print(f"s{self.serverID} request: s{request}")
-            # zkrp_share_idx = re.split(',', request.match_info.get("zkrp_share_idxes"))
+            mask_idxes = re.split(',', request.match_info.get("mask_idxes"))
 
+            # print("&&&&&", mask_idxes[0], json.dumps(self.zkrpShares[mask_idxes[0]]))
             data = {
-                "zkrp_share_idx": "123",
+                "zkrp_share_idx": json.dumps(self.zkrpShares[mask_idxes[0]]),
             }
             return web.json_response(data)
-
-            # while len(self.zkrpShares[zkrp_share_idx]) == 0:
-            #     await asyncio.sleep(10)
-            #     res = str(self.zkrpShares[zkrp_share_idx][0])
-
-            # data = {
-            #     "zkrp_shares": res,
-            # }
-            # return web.json_response(data)
 
 
         app = web.Application()
