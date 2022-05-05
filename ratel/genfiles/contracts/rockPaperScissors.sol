@@ -13,7 +13,7 @@ contract rockPaperScissors {
     mapping (address => string) public winnersValue;
     mapping (string => uint) public winnersCount;
     // TODO:
-    event CreateGame(uint seqCreateGame, uint gameId, address player1, uint idxValue1, uint maskedValue1, uint idxBlinding, uint maskedBlinding);
+    event CreateGame(uint seqCreateGame, uint gameId, address player1, uint idxValue1, uint maskedValue1, uint idxBlinding, uint maskedBlinding, uint8[] proof, uint8[] commitment);
     event JoinGame(uint seqJoinGame, uint gameId, address player2, uint idxValue2, uint maskedValue2);
     event StartRecon(uint seqStartRecon, uint gameId);
 
@@ -148,7 +148,7 @@ contract rockPaperScissors {
     }
 
     // TODO: 
-    function createGame(uint idxValue1, uint maskedValue1, uint idxBlinding, uint maskedBlinding) public {
+    function createGame(uint idxValue1, uint maskedValue1, uint idxBlinding, uint maskedBlinding, uint8[] memory proof, uint8[] memory commitment) public {
         require(inputMaskOwner[idxValue1] == msg.sender);
 	require(inputMaskOwner[idxBlinding] == msg.sender);
 
@@ -158,7 +158,7 @@ contract rockPaperScissors {
         uint seqCreateGame = opCnt++;
         opEvent[seqCreateGame] = "CreateGame";
         opContent[seqCreateGame] = abi.encode(gameId, player1, idxValue1, maskedValue1, idxBlinding, maskedBlinding);
-        emit CreateGame(seqCreateGame, gameId, player1, idxValue1, maskedValue1, idxBlinding, maskedBlinding);
+        emit CreateGame(seqCreateGame, gameId, player1, idxValue1, maskedValue1, idxBlinding, maskedBlinding, proof, commitment);
     }
 
     function joinGame(uint gameId, uint idxValue2, uint maskedValue2) public {

@@ -28,7 +28,7 @@ def createGame(appContract, value1, account):
     maskedBlinding = (blinding + bmask) % blsPrime
 
     web3.eth.defaultAccount = account.address
-    tx = appContract.functions.createGame(idx, maskedValue, bidx, maskedBlinding).buildTransaction({
+    tx = appContract.functions.createGame(idx, maskedValue, bidx, maskedBlinding, proof, commitment).buildTransaction({
         'nonce': web3.eth.get_transaction_count(web3.eth.defaultAccount)
     })
     tx_hash = sign_and_send(tx, web3, account)
