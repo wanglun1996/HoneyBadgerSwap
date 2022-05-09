@@ -103,6 +103,17 @@ class Server:
             print(f"s{self.serverID} response: {res}")
             return web.json_response(data)
 
+        # TODO: 
+        async def handler_mpc_verify(request):
+            print(f"s{self.serverID} request: s{request}")
+            mask_idxes = re.split(',', request.match_info.get("mask_idxes"))
+
+            # print("&&&&&", mask_idxes[0], json.dumps(self.zkrpShares[mask_idxes[0]]))
+            data = {
+                "zkrp_share_idx": json.dumps(self.zkrpShares[mask_idxes[0]]),
+            }
+            return web.json_response(data)
+
 
         async def handler_mpc_verify(request):
             print(f"s{self.serverID} request: s{request}")
