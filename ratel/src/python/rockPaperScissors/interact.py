@@ -8,9 +8,7 @@ from ratel.src.python.Client import get_inputmasks, reserveInput
 from ratel.src.python.deploy import url, app_addr
 from ratel.src.python.utils import parse_contract, getAccount, players, prime, sign_and_send, threshold
 
-from ratel.src.zkrp_pyo3.zkrp_pyo3 import zkrp_prove
-
-from ratel.src.zkrp_pyo3.zkrp_pyo3 import zkrp_prove
+from zkrp_pyo3 import zkrp_prove
 
 contract_name = 'rockPaperScissors'
 
@@ -25,9 +23,6 @@ def createGame(appContract, value1, account):
 
     bmask = asyncio.run(get_inputmasks(players(appContract), f'{bidx}', threshold(appContract)))[0]
     maskedBlinding = (blinding + bmask) % prime
-
-    bmask = asyncio.run(get_inputmasks(players(appContract), f'{bidx}'))[0]
-    maskedBlinding = (blinding + bmask) % blsPrime
 
     web3.eth.defaultAccount = account.address
     tx = appContract.functions.createGame(idx, maskedValue, bidx, maskedBlinding, proof, commitment).buildTransaction({
