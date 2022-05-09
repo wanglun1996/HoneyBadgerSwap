@@ -5,7 +5,6 @@ import json
 import re
 import time
 
-# TODO:
 from aiohttp import web, ClientSession
 from collections import defaultdict
 
@@ -45,31 +44,22 @@ class Server:
             self.portLock[mpc_port + i * 100] = asyncio.Lock()
 
         self.dbLock  = {}
-<<<<<<< HEAD
         self.dbLockCnt = {}
 
         self.loop = asyncio.get_event_loop()
 
-=======
-        self.dbLock['access'] = asyncio.Lock()
-        self.dbLock['execHistory'] = asyncio.Lock()
-		# TODO:
-        # self.dbLock['zkrpShare'] = asyncio.Lock()
         self.zkrpShares = defaultdict(list)
 
 
-	# TODO:
     async def get_zkrp_shares(self, players, inputmask_idxes):
         request = f"zkrp_share_idxes/{inputmask_idxes}"
         results = await send_requests(players, request)
         parsed_results = []
         for i in range(len(results)):
             parsed_results.append(json.loads(results[i]['zkrp_share_idx'])[0])
-        print("((((((((", parsed_results)
 
         return parsed_results
-		
->>>>>>> backup
+
 
     async def http_server(self):
 
@@ -113,7 +103,7 @@ class Server:
             print(f"s{self.serverID} response: {res}")
             return web.json_response(data)
 
-        # TODO: 
+
         async def handler_mpc_verify(request):
             print(f"s{self.serverID} request: s{request}")
             mask_idxes = re.split(',', request.match_info.get("mask_idxes"))
@@ -139,7 +129,6 @@ class Server:
         cors.add(resource.add_route("GET", handler_inputmask))
         resource = cors.add(app.router.add_resource("/recoverdb/{list}"))
         cors.add(resource.add_route("GET", handler_recover_db))
-        # TODO:
         resource = cors.add(app.router.add_resource("/zkrp_share_idxes/{mask_idxes}"))
         cors.add(resource.add_route("GET", handler_mpc_verify))
 

@@ -13,25 +13,16 @@ from ratel.src.zkrp_pyo3.zkrp_pyo3 import zkrp_prove
 contract_name = 'rockPaperScissors'
 
 def createGame(appContract, value1, account):
-<<<<<<< HEAD
-    idx = reserveInput(web3, appContract, 1, account)[0]
-    mask = asyncio.run(get_inputmasks(players(appContract), f'{idx}', threshold(appContract)))[0]
-    maskedValue = (value1 + mask) % prime
-=======
-    # TODO:
     proof, commitment, blinding_bytes = zkrp_prove(value1, 32)
     blinding = int.from_bytes(blinding_bytes, byteorder='little')
 
-    # TODO:
     idx, bidx = reserveInput(web3, appContract, 2, account)
 
-    mask = asyncio.run(get_inputmasks(players(appContract), f'{idx}'))[0]
-    maskedValue = (value1 + mask) % blsPrime
->>>>>>> update sol
+    mask = asyncio.run(get_inputmasks(players(appContract), f'{idx}', threshold(appContract)))[0]
+    maskedValue = (value1 + mask) % prime
 
-    # TODO:
-    bmask = asyncio.run(get_inputmasks(players(appContract), f'{bidx}'))[0]
-    maskedBlinding = (blinding + bmask) % blsPrime
+    bmask = asyncio.run(get_inputmasks(players(appContract), f'{bidx}', threshold(appContract)))[0]
+    maskedBlinding = (blinding + bmask) % prime
 
     web3.eth.defaultAccount = account.address
     tx = appContract.functions.createGame(idx, maskedValue, bidx, maskedBlinding, proof, commitment).buildTransaction({
